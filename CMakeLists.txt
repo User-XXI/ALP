@@ -3,4 +3,4 @@ project(ALP)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(ALP main.cpp)
+add_executable(ALP 2.cpp)
