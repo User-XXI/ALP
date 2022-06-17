@@ -1,0 +1,3 @@
+/home/augustus/CLionProjects/ALP/cmake-build-debug/CMakeFiles/ALP.dir
+/home/augustus/CLionProjects/ALP/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/augustus/CLionProjects/ALP/cmake-build-debug/CMakeFiles/rebuild_cache.dir
