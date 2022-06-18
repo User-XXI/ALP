@@ -49,8 +49,8 @@ cmake_ninja_workdir = /home/augustus/CLionProjects/ALP/cmake-build-debug/
 
 build cmake_object_order_depends_target_ALP: phony || CMakeFiles/ALP.dir
 
-build CMakeFiles/ALP.dir/13.cpp.o: CXX_COMPILER__ALP_Debug /home/augustus/CLionProjects/ALP/13.cpp || cmake_object_order_depends_target_ALP
-  DEP_FILE = CMakeFiles/ALP.dir/13.cpp.o.d
+build CMakeFiles/ALP.dir/21.cpp.o: CXX_COMPILER__ALP_Debug /home/augustus/CLionProjects/ALP/21.cpp || cmake_object_order_depends_target_ALP
+  DEP_FILE = CMakeFiles/ALP.dir/21.cpp.o.d
   FLAGS = -g -std=gnu++14
   OBJECT_DIR = CMakeFiles/ALP.dir
   OBJECT_FILE_DIR = CMakeFiles/ALP.dir
@@ -63,7 +63,7 @@ build CMakeFiles/ALP.dir/13.cpp.o: CXX_COMPILER__ALP_Debug /home/augustus/CLionP
 #############################################
 # Link the executable ALP
 
-build ALP: CXX_EXECUTABLE_LINKER__ALP_Debug CMakeFiles/ALP.dir/13.cpp.o
+build ALP: CXX_EXECUTABLE_LINKER__ALP_Debug CMakeFiles/ALP.dir/21.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/ALP.dir
   POST_BUILD = :
