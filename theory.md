@@ -532,8 +532,69 @@ unique_ptr<A> pA=make_unique<A>(1, 2);
 cout<<*pA<<endl;
 return 0;
 }
+```
+```cpp
+//Мой пример ответа на вопрос:
+/*
+ * Умные указатели - набор классов шаблонов предназначенных для автоматизации работы с динамической памятью.
+ * Используется прицип RAII - получение ресурса есть инициализация.
+ *
+ *
+ * std::unique_ptr
+ * - Основная фича : на один объект может указывать тоьлко один указатаель. Соответственоо, у него отсутсвуют конструктор и оператор присваивания копированием. Но должны быть перемещения
+ *   std::unique_ptr<type> pA(new obj())
+ *
+ *   рекомендуется использовать make_unique
+ *
+ *   std::unique_ptr<type> pA = std::make_unique<type>(args);
+ *
+ *
+ */
+
+
+#include <iostream>
+#include <memory>
+
+
+struct A {
+	int a;
+	int *p = nullptr;
+
+	A(int a) : a(a) {
+		p = new int[100];
+	};
+	A() {a=0;};
+	~A() {
+	delete p;
+	std::cout << "~A()" << std::endl;
+	};
+
+
+
+
+};
+
+std::ostream &operator<<(std::ostream & out, A &obj){
+
+	out << "a = " << obj.a<< std::endl;
+	return out;
+}
+
+
+
+int main() {
+
+std::unique_ptr pA = std::make_unique<A>(5);
+
+std::cout << *pA << std::endl;
+pA->a = 505;
+std::cout << *pA << std::endl;
+
+//std::cout << pA->a << std::endl;
+}
 
 ```
+
 
 ### 38. Умный указатель (smart pointer) std::shared_ptr, внутреннее устройство, пример использования.
 
