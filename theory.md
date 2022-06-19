@@ -699,6 +699,37 @@ int main() {
 ### 39. Умный указатель (smart pointer) std::weak_ptr, назначение, пример использования.
 
 
+Не владеющий (слабый) указатель. Можно проинициализировать указателем
+shared_ptr при этом значение счетчика ссылок не увеличится. С помощью метода
+weak_ptr::lock() получаем shared_ptr для объекта, если объект существует (существует хотя
+бы один shared_ptr для объекта). Если объект уже не существует (перестали существовать
+все shared_ptr на него), то lock() вернет «пустой» shared_ptr.
+```cpp
+int main()
+{
+
+weak_ptr<A> pA_W;
+{
+shared_ptr<A> pA=make_shared<A>(1, 2);
+pA_W=pA; // Инициализация weak_ptr
+cout<<pA_W.use_count()<<endl; // 1
+auto p=pA_W.lock(); // p имеет тип shared_ptr<A>
+if (p)
+cout<<*p<<endl; // Печатается объект
+else cout<<"Object deleted!!!"<<endl;
+cout<<pA_W.use_count()<<endl; // 2
+} // При выходе из блока все shared_ptr<A> уничтожаются
+auto p=pA_W.lock(); // Вернет пустой shared_ptr<A>
+if (p)
+cout<<*p<<endl;
+else cout<<"Object deleted!!!"<<endl; // Печатается Object deleted!!!
+cout<<pA_W.use_count()<<endl; // 0
+return 0;
+```
+
+
+
+
 ### 40. Перегрузка операторов new и delete.
 
 
