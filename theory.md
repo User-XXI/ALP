@@ -916,6 +916,193 @@ int main(int argc, char* argv[]) {
 
 ### 7. Дружественные функции и классы, назначение, пример.
 
+```c++
+Дружественные функции класса
+Особенности ДФ: 
+	- ДФ не получает ук-ль this, т.к. она не принадлежит классу;
+	- Дружественная функция получает доступ к объекту через формальный параметр, 
+		объект класса передается по указателю или по ссылке; 
+	- Место размещение прототипа ДФ внутри класса безразлично, 
+		на нее не распространяется действие модификаторов доступа; 
+	- ДФ может быть компонентной функцией другого класса; 
+	- ДФ может быть дружественной по отношению к нескольким классам.
+```
+
+```c++
+Дружественные классы 
+	class C1 { friend class C2; ...  }; 
+	class C2 {  ....  }
+Все функции класса С2 являются дружественными по отношению к классу С1.
+
+Пример:
+
+#include <iostream>
+
+using namespace std;
+
+class point
+{
+	int x, y;
+	public:
+	point(int a, int b) {
+		x=a; y=b;
+	}
+	friend void print(point &p); // Заголовок ДФ внутри класса 
+	// friend void A::fun(point &p); // Если ДФ принадлежит классу A
+};
+
+void print(point &p) // Дружественная функция
+{
+	cout<<endl<<"x="<< p.x<<" y="<<p.y; // Имеет доступ к закрытым полям (private)
+}
+
+int main(int argc, char* argv[]) {
+	point p1(3, 5); print(p1); // Вызов ДФ
+	return 0;
+}
+
+```
+**Пример с семинара**
+```c++
+#include <iostream>
+
+using namespace std;
+class MyVec
+{
+    int *p=nullptr;
+    int n=0;
+public:
+    MyVec(): p(nullptr) {
+        cout<<"MyVec()"<<endl;
+    }
+    MyVec(int n): n(n)
+    {
+        p=new int[n];
+        cout<<"MyVec(int n)"<<endl;
+    }
+    MyVec(int *p, int n){
+        this->n=n;
+        this->p=new int[n];
+        for(int i=0; i<n; i++)
+            this->p[i]=p[i];
+        cout<<"MyVec(int *p, int n)"<<endl;
+    }
+    MyVec(const MyVec & ob)
+    {
+        this->n=ob.n;
+        this->p=new int[n];
+        for(int i=0; i<n; i++)
+            this->p[i]=ob.p[i];
+        cout<<"MyVec(const MyVec & ob)"<<endl;
+    }
+    MyVec(MyVec && ob)
+    {
+        swap(p, ob.p);
+        swap(n, ob.n);
+        cout<<"MyVec(MyVec && ob)"<<endl;
+    }
+    MyVec& operator=(const MyVec & ob2)
+    {
+        if (&ob2 != this)
+        {
+        if (n<ob2.n)
+        {
+            delete [] p;
+            p=new int [ob2.n];
+        }
+        n=ob2.n;
+        for(int i=0; i<n; i++)
+            p[i]=ob2.p[i];
+        }
+        cout<<"MyVec& operator=(const MyVec & ob2)"<<endl;
+        return *this;
+    }
+    MyVec& operator=(MyVec && ob2)
+    {
+
+        swap(p, ob2.p);
+        swap(n, ob2.n);
+
+        cout<<"MyVec& operator=(MyVec && ob2)"<<endl;
+        return *this;
+    }
+    ~MyVec()
+    {
+        delete []p;
+        cout<<"~MyVec()"<<endl;
+    }
+    void print(ostream & out=cout)
+    {
+        for(int i=0; i<n; i++)
+            out<<p[i]<<' ';
+        out<<endl;
+    }
+    MyVec & operator++()
+    {
+        for(int i=0; i<n; i++) ++p[i];
+        return *this;
+    }
+    MyVec operator++(int)
+    {
+        MyVec ob(*this);
+        for(int i=0; i<n; i++) ++p[i];
+        return ob;
+
+    }
+    friend ostream & operator<<(ostream & out, const MyVec & ob);
+    friend MyVec operator+(const MyVec & ob1, const MyVec & ob2);
+};
+
+ostream & operator<<(ostream & out, const MyVec & ob)
+{
+    for(int i=0; i<ob.n; i++)
+        out<<ob.p[i]<<' ';
+    out<<endl;
+    return out;
+}
+
+MyVec operator+(const MyVec & ob1, const MyVec & ob2)
+{
+    MyVec ob(ob1.n+ob2.n);
+    for(int i=0; i<ob1.n; i++)
+        ob.p[i]=ob1.p[i];
+    for(int i=0; i<ob2.n; i++)
+        ob.p[i+ob1.n]=ob2.p[i];
+    return ob;
+}
+
+MyVec CreateVec()
+{
+    int m1[]={1, 2, 3, 4, 5};
+    MyVec V(m1, 5);
+    return V;
+}
+
+int main()
+{
+    /*int m1[]={1, 2, 3, 4, 5};
+    MyVec V1(m1, 5);
+    MyVec  V2=V1;
+    MyVec V3;
+    V3=V1+V2;
+    cout<<V3;*/
+    MyVec V=CreateVec();
+    cout<<V;
+    return 0;
+}
+```
+
+```c++
+```
+
+```c++
+```
+
+```c++
+```
+
+
+
 
 ### 8. Шаблоны классов в Си++. Примеры использования.
 
