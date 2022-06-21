@@ -722,7 +722,54 @@ int main() {
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить статический полиморфизм.
 
+```c++
+#include <iostream>
 
+class rectangle {
+protected:
+    double a, b;
+public:
+    rectangle (double length, double width): a(length), b(width){}
+
+    virtual double calc (){
+        return a * b;
+    }
+
+    virtual void print (){
+        std::cout << "length: " << a << "\nwidth: " << b << "\nSquare: " << calc() << std::endl;
+    }
+};
+
+class cuboid : public rectangle {
+protected:
+    double c;
+public:
+    cuboid (double length, double width, double height): rectangle(length, width), c(height){}
+
+    double calc(){
+        return rectangle::calc() * c;
+    }
+
+    void print(){
+        rectangle::print();
+        std::cout << "height: " << c << "\nVolume: " << calc() << std::endl;
+    }
+};
+
+int main(){
+    rectangle my_rec (4, 5.5);
+
+    cuboid my_cuboid (4, 5.5, 7);
+
+    rectangle *pRC = &my_rec;
+
+    pRC -> print();
+
+    pRC = &my_cuboid;
+
+    pRC -> print();
+}
+```
 
 ##### 15) Создать класс базовый класс «круг».
 Элементы класса:
