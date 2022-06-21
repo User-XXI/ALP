@@ -722,7 +722,54 @@ int main() {
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить статический полиморфизм.
 
+```c++
+#include <iostream>
 
+class rectangle {
+protected:
+    double a, b;
+public:
+    rectangle (double length, double width): a(length), b(width){}
+
+    virtual double calc (){
+        return a * b;
+    }
+
+    virtual void print (){
+        std::cout << "length: " << a << "\nwidth: " << b << "\nSquare: " << calc() << std::endl;
+    }
+};
+
+class cuboid : public rectangle {
+protected:
+    double c;
+public:
+    cuboid (double length, double width, double height): rectangle(length, width), c(height){}
+
+    double calc(){
+        return rectangle::calc() * c;
+    }
+
+    void print(){
+        rectangle::print();
+        std::cout << "height: " << c << "\nVolume: " << calc() << std::endl;
+    }
+};
+
+int main(){
+    rectangle my_rec (4, 5.5);
+
+    cuboid my_cuboid (4, 5.5, 7);
+
+    rectangle *pRC = &my_rec;
+
+    pRC -> print();
+
+    pRC = &my_cuboid;
+
+    pRC -> print();
+}
+```
 
 ##### 15) Создать класс базовый класс «круг».
 Элементы класса:
@@ -741,6 +788,52 @@ int main() {
 класса, вызвать метод базового класса через указатель на объект. Затем
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить динамический полиморфизм.
+
+```c++
+#include <iostream>
+#include <cmath>
+
+class circle{
+protected:
+    double R;
+public:
+    explicit circle (double radius): R(radius){}
+
+    virtual double calc(){
+        return 3.14159 * std::pow(R, 2);
+    }
+
+    virtual void print(){
+        std::cout << "Radius: " << R << "\nSquare: " << calc() << std::endl;
+    }
+};
+
+class sphere : public circle{
+public:
+    explicit sphere(double radius): circle(radius){}
+
+    double calc(){
+        return circle::calc() * 4 / 3 * R;
+    }
+
+    void print(){
+        std::cout << "Radius: " << R << "\nVolume: " << calc() << std::endl;
+    }
+};
+
+int main(){
+    circle c1(1.5);
+    sphere sp1(2);
+
+    circle *pC = &c1;
+
+    pC -> print();
+
+    pC = &sp1;
+    pC -> print();
+    return 0;
+}
+```
 
 
 
@@ -762,6 +855,46 @@ int main() {
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить динамический полиморфизм.
 
+```c++
+#include <iostream>
+#include <string>
+
+class automobile{
+protected:
+    std::string _id;
+    int _max_speed;
+public:
+    automobile (std::string  name, int speed): _id(name), _max_speed(speed){}
+
+    virtual void print(){
+        std::cout << "Name: " << _id << "\nMax speed: " << _max_speed << std::endl;
+    }
+};
+
+class truck : public automobile{
+protected:
+    double _load_capacity;
+public:
+    truck(std::string  name, int speed, double capacity): automobile(name, speed),  _load_capacity(capacity/1000){}
+
+    void print(){
+        automobile::print();
+        std::cout << "Load capacity (in tons): " << _load_capacity;
+    }
+};
+
+int main(){
+    automobile car1("suzuki" ,320);
+    truck mersedes1("mersedes", 200, 5200);
+
+    automobile *pCR1 = &car1;
+    pCR1 -> print();
+
+    pCR1 = & mersedes1;
+    pCR1 -> print();
+    return 0;
+}
+```
 
 
 ##### 17) Создать класс базовый класс «вещественное число».
@@ -785,7 +918,54 @@ int main() {
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить динамический полиморфизм.
 
+```c++
+#include <iostream>
+#include <cmath>
 
+class real_number{
+protected:
+    float number;
+public:
+    real_number(float  value): number(value){}
+
+    virtual float abs1(){
+        return std::abs(number);
+    }
+
+    virtual void print() {
+        std::cout << "Number: " << number << "\nAbsolute: "<< abs1() << std::endl;
+    }
+};
+
+class complex_number : public real_number{
+protected:
+    float imaginary;
+public:
+    complex_number(float value1, float value2): real_number(value1), imaginary(value2){}
+
+    float abs1(){
+        return std::sqrt(number*number + imaginary*imaginary);
+    }
+
+    void print(){
+        std::cout << "Imaginary: " << imaginary << std::endl;
+        real_number::print();
+    }
+};
+
+int main(){
+    real_number num1 (-1.4);
+    complex_number num2(1.4, -2.6);
+
+    real_number* pNUM = &num1;
+
+    pNUM -> print();
+
+    pNUM = &num2;
+    pNUM-> print();
+    return 0;
+}
+```
 
 ##### 18) Создать класс базовый класс «сотрудник компании».
 Элементы класса:
