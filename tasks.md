@@ -742,6 +742,52 @@ int main() {
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить динамический полиморфизм.
 
+```c++
+#include <iostream>
+#include <cmath>
+
+class circle{
+protected:
+    double R;
+public:
+    explicit circle (double radius): R(radius){}
+
+    virtual double calc(){
+        return 3.14159 * std::pow(R, 2);
+    }
+
+    virtual void print(){
+        std::cout << "Radius: " << R << "\nSquare: " << calc() << std::endl;
+    }
+};
+
+class sphere : public circle{
+public:
+    explicit sphere(double radius): circle(radius){}
+
+    double calc(){
+        return circle::calc() * 4 / 3 * R;
+    }
+
+    void print(){
+        std::cout << "Radius: " << R << "\nVolume: " << calc() << std::endl;
+    }
+};
+
+int main(){
+    circle c1(1.5);
+    sphere sp1(2);
+
+    circle *pC = &c1;
+
+    pC -> print();
+
+    pC = &sp1;
+    pC -> print();
+    return 0;
+}
+```
+
 
 
 ##### 16) Создать класс базовый класс «автомобиль».
