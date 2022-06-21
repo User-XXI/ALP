@@ -918,7 +918,54 @@ int main(){
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить динамический полиморфизм.
 
+```c++
+#include <iostream>
+#include <cmath>
 
+class real_number{
+protected:
+    float number;
+public:
+    real_number(float  value): number(value){}
+
+    virtual float abs1(){
+        return std::abs(number);
+    }
+
+    virtual void print() {
+        std::cout << "Number: " << number << "\nAbsolute: "<< abs1() << std::endl;
+    }
+};
+
+class complex_number : public real_number{
+protected:
+    float imaginary;
+public:
+    complex_number(float value1, float value2): real_number(value1), imaginary(value2){}
+
+    float abs1(){
+        return std::sqrt(number*number + imaginary*imaginary);
+    }
+
+    void print(){
+        std::cout << "Imaginary: " << imaginary << std::endl;
+        real_number::print();
+    }
+};
+
+int main(){
+    real_number num1 (-1.4);
+    complex_number num2(1.4, -2.6);
+
+    real_number* pNUM = &num1;
+
+    pNUM -> print();
+
+    pNUM = &num2;
+    pNUM-> print();
+    return 0;
+}
+```
 
 ##### 18) Создать класс базовый класс «сотрудник компании».
 Элементы класса:
