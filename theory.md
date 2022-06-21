@@ -1093,18 +1093,6 @@ int main()
 }
 ```
 
-```c++
-```
-
-```c++
-```
-
-```c++
-```
-
-
-
-
 ### 8. Шаблоны классов в Си++. Примеры использования.
 
 Шаблоны классов
@@ -1181,6 +1169,8 @@ class vektor
 ```
 
 ### 9. Перегрузка стандартных операций (унарных, бинарных) в случае, когда оператор-функция принадлежит классу, пример.
+
+
 ```
 Правило трёх 
 (также известное как «Закон Большой Тройки» или «Большая Тройка») - правило в C++, 
@@ -1200,7 +1190,272 @@ class vektor
 	• Оператор присваивания перемещением
 ```
 
+```c++
+Перегрузка операций в языке Си++ 
+это возможность распространения действия стандартных операций на операнды, 
+для которых эти операции первоначально не предназначались. 
+Это возможно, если хотя бы один из операндов является объектом класса, 
+для этого создается специальная, так называемая, 
+оператор - функция, которая может быть как членом класса, 
+так и функцией, не принадлежащей классу.
+
+Формат определения оператор- функции имеет вид:
+	<тип_возвращаемого_значения> 
+	operator <знак_операции> 
+	(спецификация_параметров) 
+	{
+		операторы_тела_функции
+	}
+
+Существует три способа перегрузки: 
+	- оператор-функция определяется как функция, не принадлежащая классу; 
+	- оператор-функция определяется как функция класса;
+	- оператор-функция определяется как дружественная функция класса.
+
+Особенности перегрузки операций: 
+	- можно перегружать только стандартные операции, 
+		например, нельзя перегрузить операцию ‘**’ 
+		(возведение в степень в языке Фортран, отсутствует в Си++);
+	- не допускают перегрузки операции: ‘.’, ‘.*’, ‘?:’, ‘::’, ‘sizeof’, ‘#’, ‘##’;
+	- при перегрузке сохраняется арность операций 
+		(унарная операция остается унарной, а бинарная – бинарной); 
+	- бинарная операция перегружается либо как  функция, 
+		не принадлежащая классу с двумя параметрами, 
+		один обязательно объект (ссылка на объект) класса, 
+		или как функция класса с одним параметром, 
+		первым операндом операции выступает объект класса, 
+		для которого вызывается функция; 
+	- бинарные операции ‘=‘, ‘[]’, ‘->’ 
+		должны обязательно определяться как компонентные функции класса; 
+	- унарная операция перегружается либо как  функция, 
+		не принадлежащая классу с одним параметром - объектом (ссылкой на объект) класса, 
+		или как функция класса без параметров, 
+		операндом операции выступает объект класса, 
+		для которого вызывается функция.
+
+```
+.h
+```c++
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+#ifndef FIREWALL_H
+#define FIREWALL_H
+
+class Vector // Класс - вектор
+{
+	double *point = nullptr; // Указатель на массив (вектор)
+	int n = 0; // Размерность вектора (число элементов) массива
+public:
+	Vector(); // Конструктор без параметров, задает "пустой" объект
+	Vector(double *p, int n); // Коструктор на входе массив, задающий вектор
+	Vector(int n); // Конструктор - выделяем память без инициализации
+	Vector(const Vector &V);  // Конструктор копирования
+	Vector(Vector &&V);  // Параметр - правосторонняя ссылка
+	double &operator[](int index); // Оператор - функция (перегрузка операции обращения к элементу)
+	Vector &operator=(const Vector &v2); // Оператор- функция копирования объекта
+	Vector &operator=(Vector &&v2); // Оператор- функция перемещения объекта
+	~Vector(); // Деструктор
+
+	friend double operator*(Vector &v1, Vector &v2); // Дружественная функция,
+	friend Vector operator+(const Vector &v1, const Vector &v2); // определенная вне класса
+
+	friend istream& operator>>(std::istream& in, Vector& vec);
+	friend ostream& operator<<(std::ostream& out, const Vector& vec);
+
+	void print(ostream& out = cout) const; // Печать вектора (массива), заменить на перегрузку <<
+};
+
+#endif //FIREWALL_H
+
+```
+.cpp
+```c++
+#include "Vector.h"
+#include <string>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+Vector::Vector() // Конструктор без параметров, задает "пустой" объект
+{
+	point = nullptr; // Указатель на массив (вектор)
+	n = 0; // Размерность вектора (число элементов) массива
+	cout << "Vector()" << endl;
+}
+
+Vector::Vector(double *p, int n) // Коструктор на входе массив, задающий вектор
+{
+	this->n = n; // Задаем число элементов
+	this->point = new double[n]; // Выделяем память
+	for (int i = 0; i < n; i++) this->point[i] = p[i]; // Копируем один массив в другой
+	cout << "Vector(double *p, int n)" << endl;
+}
+
+Vector::Vector(int n) : n(n) // Конструктор - выделяем память без инициализации
+{
+	point = new double[n];
+	cout << "Vector(int n)" << endl;
+}
+
+Vector::Vector(const Vector &V) { // Конструктор копирования
+	n = V.n;
+	point = new double[n];
+	for (int i = 0; i < n; i++) point[i] = V.point[i];
+	cout << "Vector(const Vector & V) n=" << n << endl;
+}
+
+void Vector::print(ostream& out) const
+{
+	for (int i = 0; i < n; i++)
+		cout << point[i] << " ";
+	cout << endl << endl;
+}
+
+Vector::Vector(Vector &&V)  // Параметр - правосторонняя ссылка
+{
+	std::swap(point, V.point);
+	std::swap(n, V.n);
+	cout << "Vector(Vector &&V)" << endl;
+}
+
+double &Vector::operator[](int index) // Оператор - функция (перегрузка операции обращения к элементу)
+{
+	return point[index];
+}
+
+Vector &Vector::operator=(const Vector &v2) // Оператор- функция копирования объекта
+{
+	if (this != &v2) // Запрет копирования вектора самого в себя
+	{
+		n = v2.n;
+		if (point != nullptr) delete[] point; // Освобождаем память старого вектора
+		point = new double[n]; // Выделяем память для нового вектора
+		for (int i = 0; i < n; i++) point[i] = v2.point[i];
+	}
+	cout << "Vector & operator = (const Vector& v2)" << endl;
+	return *this; // Возвращаем ссылку на текущий объект
+}
+
+Vector &Vector::operator=(Vector &&v2) // Оператор - функция перемещения объекта
+{
+	if (this != &v2) // Запрет перемещения вектора самого в себя
+	{
+		std::swap(point, v2.point);
+		std::swap(n, v2.n);
+	}
+	cout << "Vector & operator = (Vector&& v2)" << endl;
+	return *this; // Возвращаем ссылку на текущий объект
+}
+
+Vector::~Vector() // Деструктор
+{
+	cout << "~Vector() n=" << n << endl;
+	if (point != nullptr) delete[] point; // Освобождаем память
+}
+
+// Умножение числа на вектор (первый операнд не объект класса,
+// функция обязательно определяется вне класса)
+double operator *(Vector &v1, Vector& v2) // Оператор - функция вне класса
+{
+	double Res = 0;
+	for (int i = 0; i < v2.n; i++) Res += v1.point[i] * v2.point[i]; // Заполняем массив
+	return Res; // Возвращаем объект
+}
+Vector operator +(const Vector& v1, const Vector& v2) // Оператор - функция вне класса
+{
+	Vector V(v1.n + v2.n); // Создаем новый объект заданного размера
+	for (int i = 0; i < v1.n; i++) V.point[i] = v1.point[i]; // Заполняем массив
+	for (int i = 0; i < v2.n; i++) V.point[i + v1.n] = v2.point[i]; // Заполняем массив
+	return V; // Возвращаем объект
+}
+istream& operator >> (std::istream& in, Vector& vec)
+{
+	in >> vec.n;
+	for (int i = 0; i < vec.n; ++i) {
+		in >> vec[i];
+	}
+	return in;
+}
+ostream& operator << (std::ostream& out, const Vector& vec) {
+	{
+		for (int i = 0; i < vec.n; i++)
+			out << vec.point[i] << " ";
+		out << endl;
+	}
+	return out;
+}
+
+
+```
+main
+```c++
+#include <iostream>
+#include <fstream>
+#include "Vector.h"
+
+using namespace std;
+
+int main() {
+	ifstream file;
+	ofstream fout;
+	vector <double> nums;
+
+	file.open("input.txt");
+	fout.open("fout.txt");
+
+	if (file.is_open()) {
+		double s;
+		for (file >> s; !file.eof(); file >> s) { // пример вставки
+			nums.push_back(s);
+		}
+
+		double* numsD = new double[nums.size()];
+
+		for (int i = 0; i < nums.size(); i++) {
+			numsD[i] = nums[i]; // пример обращения к операции []
+		}
+		int size = nums.size();
+		cout << "Array:" << endl;
+		Vector v1(numsD, size);
+		v1.print(fout);
+
+		cout << "Copying" << endl;
+		Vector v2(numsD, size);
+		v2 = v1; // пример функции копирования Vector &operator=(const Vector &v2)
+		v2.print(fout);
+
+		cout << "v1 * v2 = ";
+		double Result = v1 * v2;
+		cout << Result << endl << endl;
+
+		cout << "Moving" << endl;
+		Vector v4(numsD, size);
+		Vector v5(numsD, size);
+		v4 = move(v1); //пример функции перемещения
+		v4.print(fout);
+
+		cout << "fout" << endl;
+		fout << v4;
+		std::cout << std::endl;
+
+
+	}
+
+	file.close();
+	fout.close();
+
+	return 0;
+}
+```
 ### 10. Перегрузка стандартных операций (унарных, бинарных) в случае, когда оператор-функция не принадлежит классу, пример.
+
+
 ```
 Правило трёх 
 (также известное как «Закон Большой Тройки» или «Большая Тройка») - правило в C++, 
@@ -1218,6 +1473,270 @@ class vektor
 	• Оператор присваивания копированием 
 	• Конструктор перемещения 
 	• Оператор присваивания перемещением
+```
+
+```c++
+Перегрузка операций в языке Си++ 
+это возможность распространения действия стандартных операций на операнды, 
+для которых эти операции первоначально не предназначались. 
+Это возможно, если хотя бы один из операндов является объектом класса, 
+для этого создается специальная, так называемая, 
+оператор - функция, которая может быть как членом класса, 
+так и функцией, не принадлежащей классу.
+
+Формат определения оператор- функции имеет вид:
+	<тип_возвращаемого_значения> 
+	operator <знак_операции> 
+	(спецификация_параметров) 
+	{
+		операторы_тела_функции
+	}
+
+Существует три способа перегрузки: 
+	- оператор-функция определяется как функция, не принадлежащая классу; 
+	- оператор-функция определяется как функция класса;
+	- оператор-функция определяется как дружественная функция класса.
+
+Особенности перегрузки операций: 
+	- можно перегружать только стандартные операции, 
+		например, нельзя перегрузить операцию ‘**’ 
+		(возведение в степень в языке Фортран, отсутствует в Си++);
+	- не допускают перегрузки операции: ‘.’, ‘.*’, ‘?:’, ‘::’, ‘sizeof’, ‘#’, ‘##’;
+	- при перегрузке сохраняется арность операций 
+		(унарная операция остается унарной, а бинарная – бинарной); 
+	- бинарная операция перегружается либо как  функция, 
+		не принадлежащая классу с двумя параметрами, 
+		один обязательно объект (ссылка на объект) класса, 
+		или как функция класса с одним параметром, 
+		первым операндом операции выступает объект класса, 
+		для которого вызывается функция; 
+	- бинарные операции ‘=‘, ‘[]’, ‘->’ 
+		должны обязательно определяться как компонентные функции класса; 
+	- унарная операция перегружается либо как  функция, 
+		не принадлежащая классу с одним параметром - объектом (ссылкой на объект) класса, 
+		или как функция класса без параметров, 
+		операндом операции выступает объект класса, 
+		для которого вызывается функция.
+
+```
+.h
+```c++
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+#ifndef FIREWALL_H
+#define FIREWALL_H
+
+class Vector // Класс - вектор
+{
+	double *point = nullptr; // Указатель на массив (вектор)
+	int n = 0; // Размерность вектора (число элементов) массива
+public:
+	Vector(); // Конструктор без параметров, задает "пустой" объект
+	Vector(double *p, int n); // Коструктор на входе массив, задающий вектор
+	Vector(int n); // Конструктор - выделяем память без инициализации
+	Vector(const Vector &V);  // Конструктор копирования
+	Vector(Vector &&V);  // Параметр - правосторонняя ссылка
+	double &operator[](int index); // Оператор - функция (перегрузка операции обращения к элементу)
+	Vector &operator=(const Vector &v2); // Оператор- функция копирования объекта
+	Vector &operator=(Vector &&v2); // Оператор- функция перемещения объекта
+	~Vector(); // Деструктор
+
+	friend double operator*(Vector &v1, Vector &v2); // Дружественная функция,
+	friend Vector operator+(const Vector &v1, const Vector &v2); // определенная вне класса
+
+	friend istream& operator>>(std::istream& in, Vector& vec);
+	friend ostream& operator<<(std::ostream& out, const Vector& vec);
+
+	void print(ostream& out = cout) const; // Печать вектора (массива), заменить на перегрузку <<
+};
+
+#endif //FIREWALL_H
+
+```
+.cpp
+```c++
+#include "Vector.h"
+#include <string>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+Vector::Vector() // Конструктор без параметров, задает "пустой" объект
+{
+	point = nullptr; // Указатель на массив (вектор)
+	n = 0; // Размерность вектора (число элементов) массива
+	cout << "Vector()" << endl;
+}
+
+Vector::Vector(double *p, int n) // Коструктор на входе массив, задающий вектор
+{
+	this->n = n; // Задаем число элементов
+	this->point = new double[n]; // Выделяем память
+	for (int i = 0; i < n; i++) this->point[i] = p[i]; // Копируем один массив в другой
+	cout << "Vector(double *p, int n)" << endl;
+}
+
+Vector::Vector(int n) : n(n) // Конструктор - выделяем память без инициализации
+{
+	point = new double[n];
+	cout << "Vector(int n)" << endl;
+}
+
+Vector::Vector(const Vector &V) { // Конструктор копирования
+	n = V.n;
+	point = new double[n];
+	for (int i = 0; i < n; i++) point[i] = V.point[i];
+	cout << "Vector(const Vector & V) n=" << n << endl;
+}
+
+void Vector::print(ostream& out) const
+{
+	for (int i = 0; i < n; i++)
+		cout << point[i] << " ";
+	cout << endl << endl;
+}
+
+Vector::Vector(Vector &&V)  // Параметр - правосторонняя ссылка
+{
+	std::swap(point, V.point);
+	std::swap(n, V.n);
+	cout << "Vector(Vector &&V)" << endl;
+}
+
+double &Vector::operator[](int index) // Оператор - функция (перегрузка операции обращения к элементу)
+{
+	return point[index];
+}
+
+Vector &Vector::operator=(const Vector &v2) // Оператор- функция копирования объекта
+{
+	if (this != &v2) // Запрет копирования вектора самого в себя
+	{
+		n = v2.n;
+		if (point != nullptr) delete[] point; // Освобождаем память старого вектора
+		point = new double[n]; // Выделяем память для нового вектора
+		for (int i = 0; i < n; i++) point[i] = v2.point[i];
+	}
+	cout << "Vector & operator = (const Vector& v2)" << endl;
+	return *this; // Возвращаем ссылку на текущий объект
+}
+
+Vector &Vector::operator=(Vector &&v2) // Оператор - функция перемещения объекта
+{
+	if (this != &v2) // Запрет перемещения вектора самого в себя
+	{
+		std::swap(point, v2.point);
+		std::swap(n, v2.n);
+	}
+	cout << "Vector & operator = (Vector&& v2)" << endl;
+	return *this; // Возвращаем ссылку на текущий объект
+}
+
+Vector::~Vector() // Деструктор
+{
+	cout << "~Vector() n=" << n << endl;
+	if (point != nullptr) delete[] point; // Освобождаем память
+}
+
+// Умножение числа на вектор (первый операнд не объект класса,
+// функция обязательно определяется вне класса)
+double operator *(Vector &v1, Vector& v2) // Оператор - функция вне класса
+{
+	double Res = 0;
+	for (int i = 0; i < v2.n; i++) Res += v1.point[i] * v2.point[i]; // Заполняем массив
+	return Res; // Возвращаем объект
+}
+Vector operator +(const Vector& v1, const Vector& v2) // Оператор - функция вне класса
+{
+	Vector V(v1.n + v2.n); // Создаем новый объект заданного размера
+	for (int i = 0; i < v1.n; i++) V.point[i] = v1.point[i]; // Заполняем массив
+	for (int i = 0; i < v2.n; i++) V.point[i + v1.n] = v2.point[i]; // Заполняем массив
+	return V; // Возвращаем объект
+}
+istream& operator >> (std::istream& in, Vector& vec)
+{
+	in >> vec.n;
+	for (int i = 0; i < vec.n; ++i) {
+		in >> vec[i];
+	}
+	return in;
+}
+ostream& operator << (std::ostream& out, const Vector& vec) {
+	{
+		for (int i = 0; i < vec.n; i++)
+			out << vec.point[i] << " ";
+		out << endl;
+	}
+	return out;
+}
+
+
+```
+main
+```c++
+#include <iostream>
+#include <fstream>
+#include "Vector.h"
+
+using namespace std;
+
+int main() {
+	ifstream file;
+	ofstream fout;
+	vector <double> nums;
+
+	file.open("input.txt");
+	fout.open("fout.txt");
+
+	if (file.is_open()) {
+		double s;
+		for (file >> s; !file.eof(); file >> s) { // пример вставки
+			nums.push_back(s);
+		}
+
+		double* numsD = new double[nums.size()];
+
+		for (int i = 0; i < nums.size(); i++) {
+			numsD[i] = nums[i]; // пример обращения к операции []
+		}
+		int size = nums.size();
+		cout << "Array:" << endl;
+		Vector v1(numsD, size);
+		v1.print(fout);
+
+		cout << "Copying" << endl;
+		Vector v2(numsD, size);
+		v2 = v1; // пример функции копирования Vector &operator=(const Vector &v2)
+		v2.print(fout);
+
+		cout << "v1 * v2 = ";
+		double Result = v1 * v2;
+		cout << Result << endl << endl;
+
+		cout << "Moving" << endl;
+		Vector v4(numsD, size);
+		Vector v5(numsD, size);
+		v4 = move(v1); //пример функции перемещения
+		v4.print(fout);
+
+		cout << "fout" << endl;
+		fout << v4;
+		std::cout << std::endl;
+
+
+	}
+
+	file.close();
+	fout.close();
+
+	return 0;
+}
 ```
 
 
