@@ -762,6 +762,46 @@ int main() {
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить динамический полиморфизм.
 
+```c++
+#include <iostream>
+#include <string>
+
+class automobile{
+protected:
+    std::string _id;
+    int _max_speed;
+public:
+    automobile (std::string  name, int speed): _id(name), _max_speed(speed){}
+
+    virtual void print(){
+        std::cout << "Name: " << _id << "\nMax speed: " << _max_speed << std::endl;
+    }
+};
+
+class truck : public automobile{
+protected:
+    double _load_capacity;
+public:
+    truck(std::string  name, int speed, double capacity): automobile(name, speed),  _load_capacity(capacity/1000){}
+
+    void print(){
+        automobile::print();
+        std::cout << "Load capacity (in tons): " << _load_capacity;
+    }
+};
+
+int main(){
+    automobile car1("suzuki" ,320);
+    truck mersedes1("mersedes", 200, 5200);
+
+    automobile *pCR1 = &car1;
+    pCR1 -> print();
+
+    pCR1 = & mersedes1;
+    pCR1 -> print();
+    return 0;
+}
+```
 
 
 ##### 17) Создать класс базовый класс «вещественное число».
