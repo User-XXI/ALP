@@ -1108,7 +1108,44 @@ int main(){
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить статический полиморфизм.
 
+```c++
+#include <iostream>
+class square{
+protected:
+    float a;
+public:
+    explicit square(float side): a(side){}
+    float perimeter() const{
+        return a * 4;
+    }
+    void print() const{
+        std::cout << "length: " << a << "\nPerimeter: " << perimeter() << std::endl;
+    }
+};
+class rectangle : public square{
+protected:
+    float b;
+public:
+    rectangle (float length, float width): square(length), b(width){}
+    float perimeter() const{
+        return (a + b) * 2;
+    }
+    void print() const{
+        std::cout << "width: " << b << std::endl;
+        square::print();
+    }
+};
+int main(){
+    square my_sq(4.5);
+    rectangle my_rc(4.75,2);
 
+    square* pSQ = &my_sq;
+    pSQ -> print();
+    
+    pSQ = &my_rc;
+    pSQ -> print();
+}
+```
 
 ##### 21) Реализовать класс «Время». Поля: часы, минуты, секунды.
 Конструкторы: конструктор для инициализации полей. При
