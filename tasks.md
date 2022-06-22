@@ -1108,56 +1108,7 @@ int main(){
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить статический полиморфизм.
 
-```c++
-#include <iostream>
 
-class square{
-private:
-    float a;
-public:
-    explicit square(float side): a(side){}
-
-    float perimeter() const{
-        return a * 4;
-    }
-
-    float get_a() const{
-        return a;
-    }
-
-    void print() const{
-        std::cout << "length: " << a << "\nPerimeter: " << perimeter() << std::endl;
-    }
-};
-
-class rectangle : public square{
-protected:
-    float b;
-public:
-    rectangle (float length, float width): square(length), b(width){}
-
-    float perimeter() const{
-        return (get_a() + b) * 2;
-    }
-
-    void print() const{
-        std::cout << "width: " << b << std::endl;
-        square::print();
-    }
-};
-
-int main(){
-    square my_sq(4.5);
-    rectangle my_rc(4.75,2);
-
-    square* pSQ = &my_sq;
-
-    pSQ -> print();
-    
-    pSQ = &my_rc;
-    pSQ -> print();
-}
-```
 
 ##### 21) Реализовать класс «Время». Поля: часы, минуты, секунды.
 Конструкторы: конструктор для инициализации полей. При
@@ -1469,4 +1420,43 @@ std::condition_variable).
 //печатает сообщение об этом событии. Для посылки и приема
 //оповещений использовать условную переменную (объект класса
 //std::condition_variable).
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <vector>
+#include <string>
+#include <condition_variable>
+
+std::condition_variable cv;
+std::mutex gMutex;
+bool isDone = false;
+
+void printNumbers(int n, const std::string &name)
+{
+    std::unique_lock<std::mutex> lock(gMutex);
+    for (int i = 0; i < n; i++) {
+        std::cout << name << ": " << i << std::endl;
+    }
+
+    isDone = true;
+    cv.notify_one();
+}
+
+int main()
+{
+    static const int N = 1000;
+    static const std::string NAME = "thread1";
+
+    std::thread thread(printNumbers, N, std::ref(NAME));
+    std::unique_lock<std::mutex> lock(gMutex);
+
+    while (!isDone) {
+        cv.wait(lock);
+    }
+
+    thread.join();      // Ждем, пока оно деструкторы довыполняет т.п.
+    std::cout << "Done!" << std::endl;
+
+    return 0;
+}
   ```
