@@ -987,7 +987,48 @@ int main(){
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить статический полиморфизм.
 
+```c++
+#include <iostream>
+#include <string>
 
+class employee{
+protected:
+    std::string FIO;
+    float salary;
+public:
+    employee (std::string fio, float value): FIO(fio), salary(value){}
+
+    void print(){
+        std::cout << "FIO: " << FIO << "\nSalary: " << salary << std::endl;
+    }
+};
+
+class chief : public employee{
+protected:
+    float allowance;
+public:
+    chief (std::string fio, float value, float extra_value): employee(fio, value), allowance(extra_value){}
+
+    void print(){
+        employee::print();
+        std::cout << "Salary with allowance: " << salary + allowance << std::endl;
+    }
+};
+
+int main(){
+    employee worker1("Ivan Ivanov", 1500);
+    chief worker2("Andrew Ivanov", 1500, 200);
+
+    employee* pWR = &worker2;
+
+    pWR -> print();
+
+    pWR =&worker2;
+
+    pWR -> print();
+    return 0;
+}
+```
 
 ##### 19) Создать класс базовый класс «вектор на плоскости».
 Элементы класса:
