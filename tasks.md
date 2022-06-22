@@ -1049,7 +1049,45 @@ protected), определяющей конец вектора (начало в�
 настроить ее на объект производного класса, вызвать метод производного
 класса через указатель на объект. Обеспечить статический полиморфизм.
 
+```c++
+#include <iostream>
 
+class my_vec_2D{
+protected:
+    float x;
+    float y;
+public:
+    my_vec_2D(float x1, float y1): x(x1), y(y1){}
+
+    void print(){
+        std::cout << "X: " << x << "\nY: " << y << std::endl;
+    }
+};
+
+class my_vec_3D : public my_vec_2D{
+protected:
+    float z;
+public:
+    my_vec_3D(float x1, float y1, float z1): my_vec_2D(x1, y1), z(z1){}
+
+    void print(){
+        my_vec_2D::print();
+        std::cout << "Z: " << z << std::endl;
+    }
+};
+
+int main(){
+    my_vec_2D vec1(1, 2);
+    my_vec_3D vec2(3, 5, 4);
+
+    my_vec_2D* pMV = &vec1;
+
+    pMV -> print();
+
+    pMV = &vec2;
+    pMV->print();
+}
+```
 
 ##### 20) Создать класс базовый класс «квадрат».
 Элементы класса:
