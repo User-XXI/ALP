@@ -1413,7 +1413,7 @@ void daughter(int n, const std::string &tname) {
 
     while (!flag) conditionVariable.wait(lock);
     for (size_t x = 0; x < n ; ++x) {
-        std::cout << tname << " " << random() % 100 << std::endl;
+        std::cout << tname << " " << rand() % 100 << std::endl;
     }
     flag = false;
 }
